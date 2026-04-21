@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canopy Command · Language Access Administrator Console</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1F3864;--navy-2:#142547;--navy-3:#0D1A33;
+  --teal:#006D6B;--teal-lt:#DAEEF3;--teal-br:#00A19D;
+  --amber:#D97706;--amber-lt:#FFFBEB;--amber-dk:#92400E;
+  --red:#DC2626;--red-lt:#FEF2F2;--red-dk:#991B1B;
+  --green:#16A34A;--green-lt:#F0FDF4;--green-dk:#166534;
+  --blue:#2563EB;--blue-lt:#EBF4FF;--blue-dk:#1D4ED8;
+  --bg:#0D1A33;--bg-2:#142547;--bg-3:#1F3864;
+  --panel:#FFFFFF;--panel-bg:#F5F7FA;
+  --text:#1a1a1a;--text-2:#555;--text-3:#888;--text-4:#b8b8b8;
+  --border:#E0E0E0;--border-2:#BDBDBD;--border-dark:#2A3F5F;
+  --mono:'SF Mono','Consolas','Monaco',monospace;
+}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);color:var(--text);
+  overflow-x:hidden;
+}
+
+/* ═══ TOP BAR ═══════════════════════════════════════════════════════════ */
+.topbar{
+  background:linear-gradient(90deg,var(--navy-3) 0%,var(--navy-2) 60%,var(--navy) 100%);
+  color:#fff;padding:.7rem 1.25rem;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  border-bottom:1px solid rgba(0,161,157,.25);
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 12px rgba(0,0,0,.35);
+}
+.tb-brand{display:flex;align-items:center;gap:.65rem}
+.brand-mark{
+  width:32px;height:32px;border-radius:7px;
+  background:linear-gradient(135deg,var(--teal-br),var(--teal));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;font-size:13px;letter-spacing:-.02em;
+  box-shadow:0 0 12px rgba(0,161,157,.35);
+}
+.brand-text{display:flex;flex-direction:column;line-height:1.1}
+.brand-name{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.brand-sub{font-size:10px;color:rgba(255,255,255,.55);margin-top:1px}
+.tb-center{display:flex;align-items:center;gap:1.5rem;flex:1;justify-content:center}
+.tb-meta{display:flex;flex-direction:column;line-height:1.15}
+.tb-meta-l{font-size:9px;font-weight:600;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.08em}
+.tb-meta-v{font-size:12px;color:rgba(255,255,255,.9);font-weight:500}
+.tb-live{
+  display:flex;align-items:center;gap:.45rem;
+  background:rgba(22,163,74,.12);border:1px solid rgba(22,163,74,.35);
+  padding:.3rem .7rem;border-radius:20px;
+}
+.tb-live-dot{
+  width:7px;height:7px;border-radius:50%;background:#4ade80;
+  box-shadow:0 0 8px #4ade80;animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.tb-live-txt{font-size:10px;color:#86efac;font-weight:600;letter-spacing:.03em}
+.tb-user{display:flex;align-items:center;gap:.5rem}
+.tb-avatar{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600}
+.tb-user-meta{display:flex;flex-direction:column;line-height:1.15;text-align:right}
+.tb-user-n{font-size:11px;color:#fff;font-weight:500}
+.tb-user-r{font-size:9px;color:rgba(255,255,255,.5)}
+
+/* ═══ SHELL LAYOUT ══════════════════════════════════════════════════════ */
+.shell{
+  display:grid;
+  grid-template-columns:220px 1fr 300px;
+  height:calc(100vh - 51px);
+  min-height:680px;
+}
+
+/* ═══ LEFT NAV RAIL ═════════════════════════════════════════════════════ */
+.navrail{
+  background:linear-gradient(180deg,var(--navy-2) 0%,var(--navy-3) 100%);
+  border-right:1px solid var(--border-dark);
+  overflow-y:auto;padding:.75rem .5rem;
+}
+.navrail::-webkit-scrollbar{width:4px}
+.navrail::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px}
+.nav-section{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.12em;padding:.55rem .65rem .3rem}
+.nav-item{
+  display:flex;align-items:center;gap:.55rem;
+  padding:.55rem .7rem;border-radius:8px;cursor:pointer;
+  color:rgba(255,255,255,.7);font-size:12px;font-weight:500;
+  transition:all .15s;position:relative;margin-bottom:2px;
+}
+.nav-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.95)}
+.nav-item.active{
+  background:linear-gradient(90deg,rgba(0,161,157,.18),rgba(0,161,157,.04));
+  color:#fff;
+  box-shadow:inset 3px 0 0 var(--teal-br);
+}
+.nav-icon{width:18px;height:18px;flex-shrink:0;opacity:.85}
+.nav-label{flex:1;line-height:1.3}
+.nav-badge{
+  background:var(--red);color:#fff;font-size:9px;font-weight:700;
+  padding:1px 5px;border-radius:8px;min-width:16px;text-align:center;
+}
+.nav-badge.warn{background:var(--amber)}
+.nav-badge.info{background:var(--blue)}
+.nav-cat-label{
+  font-size:8.5px;color:rgba(255,255,255,.32);
+  padding:0 .75rem;margin-top:.15rem;font-style:italic;
+  letter-spacing:.02em;line-height:1.3;
+}
+
+/* ═══ MAIN STAGE ════════════════════════════════════════════════════════ */
+.stage{
+  background:var(--panel-bg);overflow-y:auto;position:relative;
+}
+.stage::-webkit-scrollbar{width:6px}
+.stage::-webkit-scrollbar-thumb{background:#c5cdd6;border-radius:3px}
+.stage-hdr{
+  background:#fff;border-bottom:1px solid var(--border);
+  padding:.85rem 1.4rem;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:10;
+}
+.stage-hdr-l{display:flex;flex-direction:column;line-height:1.25}
+.stage-breadcrumb{font-size:10px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.stage-title{font-size:18px;color:var(--text);font-weight:600;letter-spacing:-.01em}
+.stage-sub{font-size:11px;color:var(--text-2);margin-top:2px}
+.stage-hdr-r{display:flex;align-items:center;gap:.5rem}
+.stage-chip{
+  font-size:10px;font-weight:600;padding:.3rem .65rem;border-radius:6px;
+  background:var(--panel-bg);color:var(--text-2);border:1px solid var(--border);
+}
+.stage-chip.react{background:#FEF2F2;color:var(--red-dk);border-color:#FECACA}
+.stage-chip.proact{background:#EBF4FF;color:var(--blue-dk);border-color:#BFDBFE}
+.stage-chip.both{background:var(--teal-lt);color:var(--teal);border-color:#A7D9E0}
+.stage-body{padding:1.1rem 1.4rem}
+
+/* ═══ MISSION CONTROL: HERO BANNER ═════════════════════════════════════ */
+.hero-band{
+  background:linear-gradient(135deg,var(--navy-3),var(--navy-2) 60%,#2A4A7F);
+  color:#fff;border-radius:14px;padding:1.15rem 1.4rem;margin-bottom:1rem;
+  position:relative;overflow:hidden;
+  box-shadow:0 6px 22px rgba(0,0,0,.15);
+}
+.hero-band::before{
+  content:"";position:absolute;top:-30px;right:-30px;width:220px;height:220px;
+  background:radial-gradient(circle,rgba(0,161,157,.22),transparent 70%);
+}
+.hero-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:1.5rem;position:relative;z-index:1;align-items:center}
+.hero-main-l{font-size:10px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:.25rem}
+.hero-score-row{display:flex;align-items:baseline;gap:.7rem}
+.hero-score{font-size:46px;font-weight:700;line-height:1;letter-spacing:-.03em}
+.hero-score-d{font-size:15px;color:rgba(255,255,255,.4);font-weight:400}
+.hero-stage{font-size:13px;color:#fca5a5;font-weight:600;margin-top:.3rem;letter-spacing:.02em}
+.hero-stage-desc{font-size:11px;color:rgba(255,255,255,.65);margin-top:.2rem;line-height:1.45}
+.hero-stat-l{font-size:9px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:.25rem}
+.hero-stat-n{font-size:24px;font-weight:700;line-height:1;letter-spacing:-.02em}
+.hero-stat-s{font-size:10px;color:rgba(255,255,255,.55);margin-top:.35rem;line-height:1.4}
+.hero-stat-n.red{color:#fca5a5}
+.hero-stat-n.amber{color:#fcd34d}
+.hero-stat-n.green{color:#86efac}
+
+/* ═══ KPI TILE GRID ════════════════════════════════════════════════════ */
+.section-hdr{
+  display:flex;align-items:baseline;justify-content:space-between;
+  margin:1.2rem 0 .65rem;
+}
+.section-hdr-l{display:flex;align-items:baseline;gap:.65rem}
+.section-title{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.01em}
+.section-desc{font-size:11px;color:var(--text-3)}
+.section-hdr-r{font-size:10px;color:var(--text-3);font-weight:500}
+.kpi-grid{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:10px;
+}
+.kpi-tile{
+  background:#fff;border:1px solid var(--border);border-radius:11px;padding:.75rem .85rem;
+  position:relative;overflow:hidden;cursor:pointer;transition:all .15s;
+  display:flex;flex-direction:column;min-height:138px;
+}
+.kpi-tile:hover{border-color:var(--text-3);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.kpi-tile::before{
+  content:"";position:absolute;top:0;left:0;width:100%;height:3px;background:var(--border);
+}
+.kpi-tile.crit::before{background:var(--red)}
+.kpi-tile.warn::before{background:var(--amber)}
+.kpi-tile.good::before{background:var(--green)}
+.kpi-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+.kpi-domain{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);line-height:1.2}
+.kpi-num{
+  font-size:9px;font-weight:800;font-family:var(--mono);color:var(--text-4);
+  background:var(--panel-bg);padding:1.5px 5px;border-radius:4px;
+}
+.kpi-label{font-size:10.5px;color:var(--text-2);line-height:1.35;margin-bottom:.55rem;min-height:28px}
+.kpi-val-row{display:flex;align-items:baseline;gap:.35rem;margin-bottom:.3rem}
+.kpi-val{font-size:24px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.kpi-val.crit{color:var(--red-dk)}
+.kpi-val.warn{color:var(--amber-dk)}
+.kpi-val.good{color:var(--green-dk)}
+.kpi-unit{font-size:12px;color:var(--text-3);font-weight:500}
+.kpi-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
+.kpi-target{font-size:9.5px;color:var(--text-3);font-weight:500}
+.kpi-target strong{color:var(--text-2);font-weight:700}
+.kpi-delta{
+  display:inline-flex;align-items:center;gap:2px;
+  font-size:9px;font-weight:700;padding:1.5px 5px;border-radius:4px;
+}
+.kpi-delta.down{background:var(--red-lt);color:var(--red-dk)}
+.kpi-delta.up{background:var(--green-lt);color:var(--green-dk)}
+.kpi-delta.flat{background:var(--panel-bg);color:var(--text-3)}
+
+/* ═══ HEATMAP ROW ═══════════════════════════════════════════════════════ */
+.heatmap{background:#fff;border:1px solid var(--border);border-radius:11px;padding:.9rem 1rem;margin-top:1rem}
+.heatmap-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem}
+.heatmap-title{font-size:12px;font-weight:700;color:var(--text);letter-spacing:-.01em}
+.heatmap-sub{font-size:10px;color:var(--text-3)}
+.heatmap-tbl{width:100%;border-collapse:collapse;font-size:11px}
+.heatmap-tbl th{text-align:center;font-size:9.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;padding:.3rem .25rem}
+.heatmap-tbl th:first-child{text-align:left}
+.heatmap-tbl td{padding:.45rem .25rem;font-size:11px}
+.heatmap-tbl td:first-child{font-weight:600;color:var(--text);text-align:left;padding-left:.15rem}
+.hm-cell{
+  display:inline-block;width:100%;padding:.35rem .2rem;border-radius:5px;
+  text-align:center;font-weight:700;font-size:10.5px;font-family:var(--mono);
+}
+.hm-0{background:#991B1B;color:#fff}
+.hm-1{background:#DC2626;color:#fff}
+.hm-2{background:#F59E0B;color:#fff}
+.hm-3{background:#FCD34D;color:#78350F}
+.hm-4{background:#86EFAC;color:#14532D}
+.hm-5{background:#16A34A;color:#fff}
+
+/* ═══ RIGHT RAIL: LIVE SIGNALS ═════════════════════════════════════════ */
+.rightrail{
+  background:#fff;border-left:1px solid var(--border);overflow-y:auto;
+  display:flex;flex-direction:column;
+}
+.rightrail::-webkit-scrollbar{width:4px}
+.rightrail::-webkit-scrollbar-thumb{background:#c5cdd6;border-radius:2px}
+.rr-hdr{padding:.85rem 1rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:5}
+.rr-title{font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:.4rem}
+.rr-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 6px #4ade80;animation:pulse 2s infinite}
+.rr-sub{font-size:10px;color:var(--text-3);margin-top:3px}
+.rr-filters{display:flex;gap:4px;margin-top:.55rem}
+.rr-filter{
+  font-size:9px;font-weight:600;padding:3px 7px;border-radius:4px;
+  background:var(--panel-bg);color:var(--text-2);border:1px solid var(--border);cursor:pointer;
+}
+.rr-filter.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.rr-stream{padding:.55rem .85rem;flex:1}
+.sig{
+  border-left:3px solid;padding:.55rem .7rem;border-radius:0 8px 8px 0;
+  margin-bottom:.5rem;background:var(--panel-bg);font-size:11px;line-height:1.4;
+  position:relative;
+}
+.sig-time{font-size:9.5px;font-weight:700;color:var(--text-3);font-family:var(--mono);margin-bottom:2px;display:flex;align-items:center;justify-content:space-between}
+.sig-kind{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:1px 5px;border-radius:3px}
+.sig.alert{border-color:var(--red);background:var(--red-lt)}
+.sig.alert .sig-kind{background:var(--red);color:#fff}
+.sig.warn{border-color:var(--amber);background:var(--amber-lt)}
+.sig.warn .sig-kind{background:var(--amber);color:#fff}
+.sig.info{border-color:var(--blue);background:var(--blue-lt)}
+.sig.info .sig-kind{background:var(--blue);color:#fff}
+.sig.good{border-color:var(--green);background:var(--green-lt)}
+.sig.good .sig-kind{background:var(--green);color:#fff}
+.sig-body{color:var(--text);font-size:10.5px;line-height:1.5}
+.sig-body strong{color:var(--text);font-weight:700}
+.sig-meta{font-size:9.5px;color:var(--text-3);margin-top:3px;font-family:var(--mono)}
+
+/* ═══ GENERIC PANELS (used across destinations) ═══════════════════════ */
+.panel{background:#fff;border:1px solid var(--border);border-radius:11px;padding:1rem 1.1rem;margin-bottom:.85rem}
+.panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem}
+.panel-title{font-size:12px;font-weight:700;color:var(--text);letter-spacing:-.01em}
+.panel-sub{font-size:10px;color:var(--text-3);margin-top:2px}
+
+/* Alerts queue */
+.alert-row{
+  display:grid;grid-template-columns:auto 1fr auto auto;gap:.75rem;
+  padding:.7rem .85rem;border:1px solid var(--border);border-radius:9px;
+  margin-bottom:.5rem;background:#fff;align-items:center;transition:all .15s;
+}
+.alert-row:hover{border-color:var(--text-3);box-shadow:0 3px 10px rgba(0,0,0,.05)}
+.alert-row.crit{border-left:4px solid var(--red)}
+.alert-row.high{border-left:4px solid var(--amber)}
+.alert-row.med{border-left:4px solid var(--blue)}
+.alert-sev{
+  font-size:8.5px;font-weight:700;padding:3px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.05em;
+}
+.alert-sev.crit{background:var(--red);color:#fff}
+.alert-sev.high{background:var(--amber);color:#fff}
+.alert-sev.med{background:var(--blue);color:#fff}
+.alert-content{line-height:1.35}
+.alert-title{font-size:12.5px;color:var(--text);font-weight:600}
+.alert-detail{font-size:10.5px;color:var(--text-2);margin-top:2px}
+.alert-meta{font-size:9.5px;color:var(--text-3);font-family:var(--mono);text-align:right}
+.alert-btn{font-size:10.5px;font-weight:600;padding:.35rem .7rem;border:1px solid var(--navy);background:#fff;color:var(--navy);border-radius:6px;cursor:pointer;transition:all .15s}
+.alert-btn:hover{background:var(--navy);color:#fff}
+
+/* Domain deep-dive */
+.domain-panel{margin-bottom:.75rem}
+.dp-bar-row{display:flex;align-items:center;gap:.55rem;padding:.45rem 0}
+.dp-bar-label{font-size:10.5px;color:var(--text-2);width:140px;flex-shrink:0}
+.dp-bar-track{flex:1;height:8px;background:var(--panel-bg);border-radius:4px;overflow:hidden;position:relative}
+.dp-bar-fill{height:100%;border-radius:4px;transition:width .3s}
+.dp-bar-fill.crit{background:var(--red)}
+.dp-bar-fill.warn{background:var(--amber)}
+.dp-bar-fill.good{background:var(--green)}
+.dp-bar-tgt{
+  position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--navy);
+}
+.dp-bar-val{font-size:10.5px;font-weight:700;font-family:var(--mono);color:var(--text);width:48px;text-align:right;flex-shrink:0}
+
+/* Financial monitor */
+.fin-row{display:grid;grid-template-columns:1.4fr auto 1fr auto 1fr;gap:.75rem;padding:.7rem 0;border-bottom:1px solid var(--border);align-items:center}
+.fin-row:last-child{border-bottom:none}
+.fin-lever-l{display:flex;flex-direction:column;line-height:1.3}
+.fin-lever-n{font-size:11.5px;font-weight:600;color:var(--text)}
+.fin-lever-s{font-size:9.5px;color:var(--text-3);margin-top:2px}
+.fin-spark{width:55px;height:22px}
+.fin-fig{display:flex;flex-direction:column;line-height:1.15;text-align:right}
+.fin-fig-l{font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em}
+.fin-fig-v{font-size:13px;font-weight:700;color:var(--text);font-family:var(--mono);margin-top:2px}
+.fin-fig-v.exp{color:var(--red-dk)}
+.fin-fig-v.sav{color:var(--green-dk)}
+.fin-pct{font-size:10.5px;font-weight:700;padding:3px 7px;border-radius:4px;font-family:var(--mono)}
+.fin-pct.low{background:var(--red-lt);color:var(--red-dk)}
+.fin-pct.mid{background:var(--amber-lt);color:var(--amber-dk)}
+.fin-pct.high{background:var(--green-lt);color:var(--green-dk)}
+
+/* Evidence pack strip */
+.ev-strip{background:var(--panel-bg);border:1px dashed var(--border-2);border-radius:8px;padding:.65rem .85rem;font-size:10.5px;color:var(--text-2);line-height:1.5;margin-top:.7rem}
+.ev-strip strong{color:var(--text);font-weight:700}
+
+/* Quick action bar */
+.qa-bar{display:flex;gap:.4rem;margin-top:.75rem;flex-wrap:wrap}
+.qa-btn{font-size:10.5px;font-weight:600;padding:.4rem .7rem;border-radius:7px;border:1px solid var(--border-2);background:#fff;color:var(--text);cursor:pointer;transition:all .15s}
+.qa-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+.qa-btn.primary{background:var(--teal);color:#fff;border-color:var(--teal)}
+.qa-btn.primary:hover{background:var(--navy);border-color:var(--navy)}
+
+/* Utility: placeholder for destinations not yet populated */
+.placeholder{
+  background:#fff;border:1px dashed var(--border-2);border-radius:12px;
+  padding:3rem 2rem;text-align:center;margin-top:.5rem;
+}
+.ph-icon{font-size:32px;color:var(--text-4);margin-bottom:.5rem}
+.ph-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:.4rem}
+.ph-desc{font-size:11.5px;color:var(--text-2);line-height:1.55;max-width:520px;margin:0 auto 1rem}
+.ph-features{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;max-width:620px;margin:0 auto;text-align:left}
+.ph-feat{background:var(--panel-bg);border-radius:8px;padding:.65rem .8rem}
+.ph-feat-n{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.ph-feat-d{font-size:10.5px;color:var(--text-2);line-height:1.4}
+
+/* Audit trail timeline */
+.timeline{padding:.5rem 0}
+.tp-row{display:grid;grid-template-columns:auto 1fr auto;gap:.8rem;padding:.55rem 0;border-left:2px solid var(--border);margin-left:.65rem;padding-left:1rem;position:relative}
+.tp-row::before{
+  content:"";position:absolute;left:-6px;top:.75rem;
+  width:10px;height:10px;border-radius:50%;
+  background:var(--border);border:2px solid #fff;
+}
+.tp-row.done::before{background:var(--green)}
+.tp-row.fail::before{background:var(--red)}
+.tp-row.pending::before{background:var(--amber)}
+.tp-time{font-family:var(--mono);font-size:10px;color:var(--text-3);font-weight:700}
+.tp-body{line-height:1.4}
+.tp-name{font-size:11.5px;font-weight:600;color:var(--text)}
+.tp-d{font-size:10.5px;color:var(--text-2);margin-top:1px}
+.tp-st{font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:4px}
+.tp-st.done{background:var(--green-lt);color:var(--green-dk)}
+.tp-st.fail{background:var(--red-lt);color:var(--red-dk)}
+.tp-st.pending{background:var(--amber-lt);color:var(--amber-dk)}
+
+/* Encounter selector */
+.enc-picker{display:flex;gap:.5rem;align-items:center;margin-bottom:.85rem;background:#fff;padding:.7rem .9rem;border:1px solid var(--border);border-radius:10px}
+.enc-picker-l{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em}
+.enc-picker-in{flex:1;padding:.4rem .6rem;border:1px solid var(--border);border-radius:6px;font-family:var(--mono);font-size:12px;background:var(--panel-bg)}
+.enc-picker-meta{display:flex;gap:1rem;font-size:10.5px;color:var(--text-2)}
+.enc-picker-meta strong{color:var(--text)}
+
+/* Workforce Intelligence blocks */
+.wf-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.wf-block{background:var(--panel-bg);border-radius:9px;padding:.75rem .85rem}
+.wf-block-l{font-size:9.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.35rem}
+.wf-block-v{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.02em}
+.wf-block-d{font-size:10.5px;color:var(--text-2);margin-top:.2rem;line-height:1.4}
+.wf-bar{display:flex;align-items:center;gap:.5rem;margin-top:.45rem}
+.wf-bar-t{flex:1;height:5px;background:#fff;border-radius:3px;overflow:hidden}
+.wf-bar-f{height:100%;background:var(--teal)}
+
+/* Intervention planner sliders */
+.scenario-row{display:grid;grid-template-columns:1fr auto auto;gap:.85rem;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--border)}
+.scenario-row:last-child{border-bottom:none}
+.scenario-l{font-size:11.5px;color:var(--text);font-weight:500;line-height:1.35}
+.scenario-l em{font-size:10px;color:var(--text-3);font-style:normal;display:block;margin-top:1px}
+.scenario-inp{display:flex;align-items:center;gap:.45rem}
+.scenario-range{width:120px;accent-color:var(--teal)}
+.scenario-v{font-size:11.5px;font-weight:700;color:var(--navy);font-family:var(--mono);min-width:40px;text-align:right}
+.scenario-impact{font-size:10.5px;color:var(--teal);font-weight:700;font-family:var(--mono);text-align:right;min-width:80px}
+
+/* Readiness ring */
+.ready-ring{display:flex;align-items:center;gap:1.2rem;padding:.4rem 0}
+.ready-ring-svg{flex-shrink:0}
+.ready-ring-meta{flex:1}
+.ready-ring-t{font-size:12px;font-weight:700;color:var(--text);margin-bottom:.25rem}
+.ready-ring-d{font-size:10.5px;color:var(--text-2);line-height:1.55}
+
+/* Board briefing preview */
+.brief-doc{background:#fff;border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.brief-h1{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:.15rem;letter-spacing:-.01em}
+.brief-h2{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem}
+.brief-comp{border-left:3px solid var(--teal);padding:.25rem 0 .25rem .85rem;margin-bottom:.9rem}
+.brief-comp-n{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.brief-comp-t{font-size:12.5px;color:var(--text);font-weight:700;margin-bottom:4px}
+.brief-comp-b{font-size:11px;color:var(--text-2);line-height:1.55}
+.brief-comp-b strong{color:var(--text)}
+
+/* Responsive fallback */
+@media (max-width:1100px){
+  .shell{grid-template-columns:180px 1fr 260px}
+  .kpi-grid{grid-template-columns:repeat(5,1fr)}
+  .hero-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:820px){
+  .shell{grid-template-columns:1fr;height:auto}
+  .navrail,.rightrail{display:none}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .hero-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ TOP BAR ═══ -->
+<div class="topbar">
+  <div class="tb-brand">
+    <div class="brand-mark">CC</div>
+    <div class="brand-text">
+      <div class="brand-name">Canopy Command</div>
+      <div class="brand-sub">Language Access Administrator Console</div>
+    </div>
+  </div>
+  <div class="tb-center">
+    <div class="tb-meta"><div class="tb-meta-l">Organization</div><div class="tb-meta-v">Eisenhower Health</div></div>
+    <div class="tb-meta"><div class="tb-meta-l">Reporting Period</div><div class="tb-meta-v">Q1 2026 · Shift A</div></div>
+    <div class="tb-meta"><div class="tb-meta-l">Data Source</div><div class="tb-meta-v">1,000 LEP Encounters</div></div>
+    <div class="tb-live"><span class="tb-live-dot"></span><span class="tb-live-txt">LIVE · FHIR sync 14s ago</span></div>
+  </div>
+  <div class="tb-user">
+    <div class="tb-user-meta">
+      <div class="tb-user-n">Dr. J. Okafor</div>
+      <div class="tb-user-r">Director · Language Access</div>
+    </div>
+    <div class="tb-avatar">JO</div>
+  </div>
+</div>
+
+<!-- ═══ SHELL ═══ -->
+<div class="shell">
+
+  <!-- ─── LEFT NAV RAIL ─── -->
+  <div class="navrail">
+    <div class="nav-section">Today</div>
+    <div class="nav-item active" data-dest="mission" onclick="go('mission')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>
+      <span class="nav-label">Mission Control</span>
+    </div>
+    <div class="nav-cat-label">KPIs · 24h deltas · trend</div>
+
+    <div class="nav-item" data-dest="alerts" onclick="go('alerts')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 20h20L12 2z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="17" r=".8" fill="currentColor"/></svg>
+      <span class="nav-label">Live Alerts</span>
+      <span class="nav-badge">14</span>
+    </div>
+    <div class="nav-cat-label">Threshold breaches · owner routing</div>
+
+    <div class="nav-item" data-dest="audit" onclick="go('audit')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+      <span class="nav-label">Encounter Audit</span>
+    </div>
+    <div class="nav-cat-label">T1–T7 drill-down · forensic view</div>
+
+    <div class="nav-section" style="margin-top:1rem">Understand</div>
+    <div class="nav-item" data-dest="domains" onclick="go('domains')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="nav-label">Domain Deep-Dive</span>
+    </div>
+    <div class="nav-cat-label">10 domains · evidence anchors</div>
+
+    <div class="nav-section" style="margin-top:1rem">Quantify</div>
+    <div class="nav-item" data-dest="finance" onclick="go('finance')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span class="nav-label">Financial Monitor</span>
+      <span class="nav-badge info">6</span>
+    </div>
+    <div class="nav-cat-label">6 ROI levers · exposure vs. capture</div>
+
+    <div class="nav-section" style="margin-top:1rem">Plan</div>
+    <div class="nav-item" data-dest="workforce" onclick="go('workforce')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="nav-label">Workforce Intel</span>
+    </div>
+    <div class="nav-cat-label">QBS · training · language match</div>
+
+    <div class="nav-item" data-dest="intervene" onclick="go('intervene')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <span class="nav-label">Intervention Planner</span>
+    </div>
+    <div class="nav-cat-label">Scenario modeling · CAP builder</div>
+
+    <div class="nav-section" style="margin-top:1rem">Report</div>
+    <div class="nav-item" data-dest="audit-ready" onclick="go('audit-ready')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <span class="nav-label">Audit Readiness</span>
+      <span class="nav-badge warn">!</span>
+    </div>
+    <div class="nav-cat-label">1557 evidence · spot-review prep</div>
+
+    <div class="nav-item" data-dest="board" onclick="go('board')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span class="nav-label">Board Briefing</span>
+    </div>
+    <div class="nav-cat-label">Governance synthesis · export</div>
+  </div>
+
+  <!-- ─── MAIN STAGE ─── -->
+  <div class="stage">
+    <div class="stage-hdr" id="stage-hdr">
+      <!-- filled by JS -->
+    </div>
+    <div class="stage-body" id="stage-body">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
+  <!-- ─── RIGHT RAIL: LIVE SIGNALS ─── -->
+  <div class="rightrail">
+    <div class="rr-hdr">
+      <div class="rr-title"><span class="rr-dot"></span>Live System Signals</div>
+      <div class="rr-sub">T1–T7 event stream · 24h rolling window</div>
+      <div class="rr-filters">
+        <div class="rr-filter on">All</div>
+        <div class="rr-filter">Alerts</div>
+        <div class="rr-filter">Trigger</div>
+        <div class="rr-filter">Info</div>
+      </div>
+    </div>
+    <div class="rr-stream" id="rr-stream">
+      <!-- filled by JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+/* ───────────────────────────────────────────────────────────────────────────
+ * DATA (computed from LAI_Q1_2026_Sample_Dataset.xlsx — 1,000 encounters)
+ * ──────────────────────────────────────────────────────────────────────── */
+var LAI_COMPOSITE = 23;          // computed weighted composite across 10 domains
+var LAI_STAGE = 'Stage 1 · Developing';
+var LAI_STAGE_DESC = 'Policies exist but execution is inconsistent. Most touchpoints lack documentation.';
+
+var KPIS = [
+  {
+    n:'01', domain:'Access', arc:'clinical',
+    label:'LEP patients with interpreter/QBS contact ≤10 min in ED',
+    val:3.1, unit:'%', target:'≥90%', status:'crit',
+    delta:-1.4, evidence:'Valderrama et al. (2021); NYCRR §405.7',
+    detail:'221 ED LEP encounters w/ delays logged · median 23.2 min · p90 46.0 min'
+  },
+  {
+    n:'02', domain:'Patient Experience', arc:'clinical',
+    label:'Providers explained in a way patient understood',
+    val:30.7, unit:'%', target:'≥85%', status:'crit',
+    delta:-0.3, evidence:'Torresdey et al. (2024) HCAHPS gap',
+    detail:'Comprehension confirmation recorded for 307 of 1,000 encounters'
+  },
+  {
+    n:'03', domain:'Clinical Outcomes', arc:'clinical',
+    label:'Preventive services completed for LEP patients',
+    val:17.1, unit:'%', target:'≥80%', status:'crit',
+    delta:+0.8, evidence:'Ramirez et al. (2022); Jacobs et al. (2006)',
+    detail:'171 completions across screening, immunization, and counseling orders'
+  },
+  {
+    n:'04', domain:'Compliance', arc:'ops',
+    label:'Section 1557 language-access attestation documented',
+    val:44.2, unit:'%', target:'≥95%', status:'crit',
+    delta:+2.1, evidence:'45 C.F.R. §92.201 · Berkeley/NHeLP (2010)',
+    detail:'442 of 1,000 encounters have complete 1557 attestation trail'
+  },
+  {
+    n:'05', domain:'Patient Engagement', arc:'ops',
+    label:'Teach-back completed in preferred language',
+    val:1.7, unit:'%', target:'≥80%', status:'crit',
+    delta:0, evidence:'Hong et al. (2019) HR 0.77 · 23% lower readmission',
+    detail:'Only 17 of 1,000 encounters show teach-back confirmation — strongest lever'
+  },
+  {
+    n:'06', domain:'Financial Stewardship', arc:'strat',
+    label:'Reimbursement opportunities captured (inverse of missed)',
+    val:37.2, unit:'%', target:'≥95%', status:'crit',
+    delta:-3.2, evidence:'CMS 96160 · G0019 · TCM · CCM billing analysis',
+    detail:'628 of 1,000 encounters show missed billing capture opportunity'
+  },
+  {
+    n:'07', domain:'Quality & Safety', arc:'clinical',
+    label:'Adverse event rate in LEP encounters',
+    val:4.3, unit:'%', target:'≤1.5%', status:'warn', invert:true,
+    delta:+0.2, evidence:'Divi et al. (2007); Karliner et al. (2020)',
+    detail:'43 documented adverse events · 2.87× evidence-based target ceiling'
+  },
+  {
+    n:'08', domain:'Workforce Development', arc:'strat',
+    label:'QBS-qualified providers in deployed workforce',
+    val:6.8, unit:'%', target:'≥15%', status:'crit',
+    delta:+0.4, evidence:'Amobi et al. (2024, JAMA) QBS standard',
+    detail:'68 of 1,000 encounter-provider assignments meet QBS benchmark'
+  },
+  {
+    n:'09', domain:'Workflow Optimization', arc:'ops',
+    label:'All T1–T7 touchpoints documented (encounter complete)',
+    val:2.3, unit:'%', target:'≥85%', status:'crit',
+    delta:+0.1, evidence:'Khedr et al. (2020); TeamSTEPPS SBAR/CUS',
+    detail:'23 fully-documented encounters · 18pp variance across service lines'
+  },
+  {
+    n:'10', domain:'Technology Innovation', arc:'strat',
+    label:'High tech-integration deployment (auto-doc + VRI)',
+    val:33.5, unit:'%', target:'≥80%', status:'warn',
+    delta:+1.8, evidence:'Barwise et al. (2024); Malevanchik et al. (2021)',
+    detail:'335 of 1,000 encounters delivered via high-integration technology'
+  }
+];
+
+// Service-line heatmap (T1–T7 documentation completeness %)
+var HEATMAP = [
+  {name:'ED',                access:3.1,  compliance:42.1, engage:1.6,  workflow:2.4, outcomes:15.2, safety:4.8},
+  {name:'Inpatient',         access:8.3,  compliance:46.9, engage:2.0,  workflow:2.0, outcomes:18.1, safety:3.9},
+  {name:'OB / L&D',          access:12.3, compliance:48.8, engage:0.5,  workflow:0.5, outcomes:20.4, safety:4.3},
+  {name:'Behavioral Health', access:18.3, compliance:38.7, engage:3.2,  workflow:5.4, outcomes:14.0, safety:2.2},
+  {name:'Outpatient',        access:22.9, compliance:45.9, engage:2.7,  workflow:4.1, outcomes:20.3, safety:5.4}
+];
+
+// Live system signals (24h rolling)
+var SIGNALS = [
+  {t:'14:21', kind:'alert', cat:'Access',
+   body:'<strong>Interpreter timeout · ED-A · Bay 7</strong> — Mandarin VRI unanswered 18 min · patient triaged without access',
+   meta:'Enc #4821 · Assigned → ED Charge RN'},
+  {t:'14:07', kind:'warn', cat:'Compliance',
+   body:'<strong>T3 attestation missing</strong> · Section 1557 consent not documented at H&P · 6th occurrence today in Inpatient-3',
+   meta:'Enc #4819 · Owner → Dr. Patel'},
+  {t:'13:58', kind:'alert', cat:'Engagement',
+   body:'<strong>Discharge w/o teach-back</strong> — Vietnamese LEP patient · CHF index diagnosis · readmission risk flagged',
+   meta:'Enc #4815 · Escalated to Discharge Planner'},
+  {t:'13:44', kind:'good', cat:'Workflow',
+   body:'<strong>Full T1–T7 encounter complete</strong> — Russian LEP · OB triage to 72h post-discharge · billing cascade $486',
+   meta:'Enc #4812 · Exemplar flagged for training'},
+  {t:'13:31', kind:'info', cat:'Finance',
+   body:'<strong>96160 captured</strong> · SDOH screening billing line posted to Epic · $18.40 preventive carve-out',
+   meta:'Enc #4810 · Auto-posted via FHIR'},
+  {t:'13:19', kind:'warn', cat:'Access',
+   body:'<strong>Language mismatch</strong> · Assigned provider speaks Spanish; patient prefers Arabic · interpreter requested retroactively',
+   meta:'Enc #4807 · 11 min T2 delay'},
+  {t:'13:04', kind:'alert', cat:'Safety',
+   body:'<strong>Adverse event with LEP flag</strong> — Medication reconciliation error · dose clarification failure at discharge',
+   meta:'Enc #4803 · RCA queued · Quality notified'},
+  {t:'12:52', kind:'info', cat:'Workforce',
+   body:'<strong>QBS credential expiring</strong> — Dr. Nguyen (Vietnamese) · recertification due in 14 days',
+   meta:'HR pipeline · scheduled refresh'},
+  {t:'12:38', kind:'good', cat:'Engagement',
+   body:'<strong>Teach-back documented</strong> · Korean LEP · diabetes self-management · G0019 billable',
+   meta:'Enc #4798 · Exemplar'},
+  {t:'12:24', kind:'warn', cat:'Technology',
+   body:'<strong>VRI cart offline</strong> · Postpartum-1 · vendor ticket filed · contingency: audio-only fallback',
+   meta:'Unit tech · ETA 90 min'}
+];
+
+// Destination config
+var DESTS = {
+  'mission': {breadcrumb:'Today', title:'Mission Control', sub:'Ten KPIs · one from each LAI domain · live telemetry off the encounter stream', chip:'both', chipLbl:'Reactive + Proactive'},
+  'alerts': {breadcrumb:'Today', title:'Live Alerts Queue', sub:'Threshold breaches in the rolling 24h window — each routed to a named owner', chip:'react', chipLbl:'Reactive'},
+  'audit': {breadcrumb:'Today', title:'Encounter Audit Trail', sub:'Forensic T1–T7 walk-through · admin-side mirror of the patient Navigator', chip:'react', chipLbl:'Reactive · Investigative'},
+  'domains': {breadcrumb:'Understand', title:'Domain Deep-Dive', sub:'Ten LAI domains · evidence anchors · 30/60/90-day trend · stage-gate gaps', chip:'both', chipLbl:'Reactive + Proactive'},
+  'finance': {breadcrumb:'Quantify', title:'Financial Monitor', sub:'Six ROI levers · exposure on the left, capture on the right · complements per-encounter billing', chip:'proact', chipLbl:'Proactive'},
+  'workforce': {breadcrumb:'Plan', title:'Workforce Intelligence', sub:'QBS pipeline · training calendar · language-match gap by shift & unit', chip:'proact', chipLbl:'Proactive'},
+  'intervene': {breadcrumb:'Plan', title:'Intervention Planner', sub:'Scenario modeling — what happens to LAI and ROI if I fund this?', chip:'proact', chipLbl:'Proactive'},
+  'audit-ready': {breadcrumb:'Report', title:'Audit Readiness', sub:'Section 1557 evidence-package compiler · encounters that would fail a spot review today', chip:'proact', chipLbl:'Proactive'},
+  'board': {breadcrumb:'Report', title:'Board Briefing', sub:'Governance synthesis in the four-component CLEAR Module 7 format · export-ready', chip:'proact', chipLbl:'Proactive'}
+};
+
+/* ───────────────────────────────────────────────────────────────────────────
+ * RENDERERS
+ * ──────────────────────────────────────────────────────────────────────── */
+function go(dest){
+  // Update nav active state
+  document.querySelectorAll('.nav-item').forEach(function(el){
+    el.classList.toggle('active', el.dataset.dest === dest);
+  });
+  // Update header
+  var d = DESTS[dest];
+  document.getElementById('stage-hdr').innerHTML =
+    '<div class="stage-hdr-l">' +
+      '<div class="stage-breadcrumb">' + d.breadcrumb + '</div>' +
+      '<div class="stage-title">' + d.title + '</div>' +
+      '<div class="stage-sub">' + d.sub + '</div>' +
+    '</div>' +
+    '<div class="stage-hdr-r">' +
+      '<span class="stage-chip ' + d.chip + '">' + d.chipLbl + '</span>' +
+      '<span class="stage-chip">Q1 2026</span>' +
+    '</div>';
+  // Render body
+  var body = document.getElementById('stage-body');
+  if(dest==='mission') body.innerHTML = renderMission();
+  else if(dest==='alerts') body.innerHTML = renderAlerts();
+  else if(dest==='audit') body.innerHTML = renderAudit();
+  else if(dest==='domains') body.innerHTML = renderDomains();
+  else if(dest==='finance') body.innerHTML = renderFinance();
+  else if(dest==='workforce') body.innerHTML = renderWorkforce();
+  else if(dest==='intervene') body.innerHTML = renderIntervene();
+  else if(dest==='audit-ready') body.innerHTML = renderAuditReady();
+  else if(dest==='board') body.innerHTML = renderBoard();
+  body.scrollTop = 0;
+}
+
+function renderMission(){
+  // Hero
+  var cntCrit = KPIS.filter(function(k){return k.status==='crit'}).length;
+  var cntWarn = KPIS.filter(function(k){return k.status==='warn'}).length;
+  var hero =
+    '<div class="hero-band">' +
+      '<div class="hero-grid">' +
+        '<div>' +
+          '<div class="hero-main-l">LAI Composite · Q1 2026</div>' +
+          '<div class="hero-score-row"><span class="hero-score">' + LAI_COMPOSITE + '</span><span class="hero-score-d">/ 100</span></div>' +
+          '<div class="hero-stage">' + LAI_STAGE + '</div>' +
+          '<div class="hero-stage-desc">' + LAI_STAGE_DESC + '</div>' +
+        '</div>' +
+        '<div>' +
+          '<div class="hero-stat-l">Domains Critical</div>' +
+          '<div class="hero-stat-n red">' + cntCrit + ' / 10</div>' +
+          '<div class="hero-stat-s">Below 35 — immediate attention</div>' +
+        '</div>' +
+        '<div>' +
+          '<div class="hero-stat-l">Active Alerts (24h)</div>' +
+          '<div class="hero-stat-n amber">14</div>' +
+          '<div class="hero-stat-s">3 critical · 6 high · 5 medium</div>' +
+        '</div>' +
+        '<div>' +
+          '<div class="hero-stat-l">Captured YTD</div>' +
+          '<div class="hero-stat-n green">$41.2K</div>' +
+          '<div class="hero-stat-s">vs. $487K exposure — 8.5% capture rate</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  // KPI tiles
+  var tiles = KPIS.map(function(k){
+    var deltaClass = k.delta > 0 ? 'up' : k.delta < 0 ? 'down' : 'flat';
+    var deltaArrow = k.delta > 0 ? '▲' : k.delta < 0 ? '▼' : '→';
+    var deltaText = (k.delta===0 ? 'flat' : Math.abs(k.delta).toFixed(1) + 'pp');
+    return '<div class="kpi-tile ' + k.status + '" onclick="go(\'domains\')">' +
+      '<div class="kpi-head">' +
+        '<div class="kpi-domain">' + k.domain + '</div>' +
+        '<div class="kpi-num">LAI ' + k.n + '</div>' +
+      '</div>' +
+      '<div class="kpi-label">' + k.label + '</div>' +
+      '<div class="kpi-val-row">' +
+        '<span class="kpi-val ' + k.status + '">' + k.val + '</span>' +
+        '<span class="kpi-unit">' + k.unit + '</span>' +
+      '</div>' +
+      '<div class="kpi-footer">' +
+        '<div class="kpi-target">Target <strong>' + k.target + '</strong></div>' +
+        '<div class="kpi-delta ' + deltaClass + '">' + deltaArrow + ' ' + deltaText + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  var tileSection =
+    '<div class="section-hdr">' +
+      '<div class="section-hdr-l">' +
+        '<div class="section-title">Ten-Domain KPI Panel</div>' +
+        '<div class="section-desc">one representative indicator per LAI domain · 24h delta · click any tile to drill</div>' +
+      '</div>' +
+      '<div class="section-hdr-r">tap tile → Domain Deep-Dive</div>' +
+    '</div>' +
+    '<div class="kpi-grid">' + tiles + '</div>';
+
+  // Heatmap
+  function hmCell(v,inverted){
+    var tier = inverted ? (v>=5?0:v>=4?1:v>=3?2:v>=2?3:v>=1?4:5) :
+                          (v<5?0:v<15?1:v<30?2:v<50?3:v<70?4:5);
+    return '<td><span class="hm-cell hm-' + tier + '">' + v.toFixed(1) + '</span></td>';
+  }
+  var heatmap =
+    '<div class="heatmap">' +
+      '<div class="heatmap-hdr">' +
+        '<div>' +
+          '<div class="heatmap-title">Service-Line Heatmap · Documentation Completeness</div>' +
+          '<div class="heatmap-sub">darker red = wider gap vs. evidence-based target · click a cell to drill</div>' +
+        '</div>' +
+      '</div>' +
+      '<table class="heatmap-tbl">' +
+        '<thead><tr><th>Service Line</th><th>Access</th><th>Compliance</th><th>Engagement</th><th>Workflow</th><th>Outcomes</th><th>Safety<br><small style="font-weight:400">(gap, lower better)</small></th></tr></thead>' +
+        '<tbody>' +
+          HEATMAP.map(function(r){
+            return '<tr><td>' + r.name + '</td>' +
+              hmCell(r.access) + hmCell(r.compliance) + hmCell(r.engage) +
+              hmCell(r.workflow) + hmCell(r.outcomes) + hmCell(r.safety,true) +
+              '</tr>';
+          }).join('') +
+        '</tbody>' +
+      '</table>' +
+    '</div>';
+
+  return hero + tileSection + heatmap;
+}
+
+function renderAlerts(){
+  var alerts = [
+    {sev:'crit', domain:'Access', title:'Interpreter timeout · ED-A · Bay 7',
+     detail:'Mandarin VRI unanswered 18 min · patient triaged without access · T2 incomplete',
+     enc:'Enc #4821', owner:'ED Charge RN', age:'12m ago'},
+    {sev:'crit', domain:'Patient Engagement', title:'Discharge without teach-back · high-risk readmit',
+     detail:'Vietnamese LEP · CHF index · Hong 2019 protocol not triggered · readmission risk elevated',
+     enc:'Enc #4815', owner:'Discharge Planner', age:'25m ago'},
+    {sev:'crit', domain:'Quality & Safety', title:'Adverse event w/ LEP flag · medication reconciliation',
+     detail:'Dose clarification failure at discharge · RCA queued · Quality & Legal notified · no harm confirmed',
+     enc:'Enc #4803', owner:'Quality / Dr. Okafor', age:'1h 15m ago'},
+    {sev:'high', domain:'Compliance', title:'1557 attestation missing · 6th today · Inpatient-3',
+     detail:'Pattern detected: attending group not completing T3 attestation on H&P · systemic, not individual',
+     enc:'Multiple encs', owner:'Dr. Patel (Service Chief)', age:'16m ago'},
+    {sev:'high', domain:'Access', title:'Language-match mismatch · provider ↔ patient',
+     detail:'Provider speaks Spanish; patient prefers Arabic · interpreter requested retroactively · 11m T2 delay',
+     enc:'Enc #4807', owner:'Bed Control', age:'1h 2m ago'},
+    {sev:'high', domain:'Technology', title:'VRI cart offline · Postpartum-1',
+     detail:'Vendor ticket filed · audio-only fallback active · 3 encounters affected since 12:24',
+     enc:'Unit-level', owner:'IT Clinical · Tech Ops', age:'1h 57m ago'},
+    {sev:'med', domain:'Workforce', title:'QBS credential expiring · Dr. Nguyen',
+     detail:'Vietnamese QBS · recertification due in 14 days · current active LEP panel: 23 patients',
+     enc:'Pipeline', owner:'HR / Med Staff Office', age:'2h 43m ago'},
+    {sev:'med', domain:'Workflow', title:'T4 checkpoint skipped · Med-Surg-2',
+     detail:'RN check-in without interpreter · pattern: 3rd shift · check-backs not reaching documented threshold',
+     enc:'Shift pattern', owner:'Night Shift Supervisor', age:'3h 8m ago'}
+  ];
+  var rows = alerts.map(function(a){
+    return '<div class="alert-row ' + a.sev + '">' +
+      '<div><span class="alert-sev ' + a.sev + '">' + a.sev + '</span></div>' +
+      '<div class="alert-content">' +
+        '<div class="alert-title">' + a.title + '</div>' +
+        '<div class="alert-detail">' + a.detail + '</div>' +
+      '</div>' +
+      '<div class="alert-meta">' + a.domain + '<br>' + a.enc + '<br><strong>' + a.owner + '</strong></div>' +
+      '<div><button class="alert-btn">Open SBAR</button></div>' +
+    '</div>';
+  }).join('');
+
+  var summary =
+    '<div class="panel">' +
+      '<div class="panel-hdr">' +
+        '<div>' +
+          '<div class="panel-title">Rolling 24-Hour Queue · 14 Open · 8 Shown</div>' +
+          '<div class="panel-sub">each alert populates an SBAR handoff in one tap · close-loop tracked</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:.4rem">' +
+          '<button class="qa-btn">Filter: All</button>' +
+          '<button class="qa-btn">Critical</button>' +
+          '<button class="qa-btn primary">Export CSV</button>' +
+        '</div>' +
+      '</div>' +
+      rows +
+    '</div>';
+  return summary;
+}
+
+function renderAudit(){
+  // Mirror of patient simulation — this is the admin-side forensic view of an encounter
+  var picker =
+    '<div class="enc-picker">' +
+      '<div class="enc-picker-l">Encounter</div>' +
+      '<input class="enc-picker-in" value="4812 · Russian LEP · OB triage → 72h post-discharge" readonly>' +
+      '<div class="enc-picker-meta">' +
+        '<div>Patient: <strong>Anonymized</strong></div>' +
+        '<div>MRN: <strong>•••4812</strong></div>' +
+        '<div>Arrival: <strong>Q1 · 03:14</strong></div>' +
+        '<div>Status: <strong style="color:var(--green-dk)">All T1–T7 complete</strong></div>' +
+      '</div>' +
+    '</div>';
+
+  var tl = [
+    {t:'03:14', st:'done', name:'T1 · Pre-arrival identification',
+     d:'Preferred language flagged as Russian in registration · auto-dispatch to OB triage pool'},
+    {t:'03:19', st:'done', name:'T2 · Triage (Canopy Navigator tablet)',
+     d:'Vital signs · chief-complaint captured bilingually · HVS + PRAPARE screeners administered · interpreter contact at 3:21 (2 min)'},
+    {t:'03:44', st:'done', name:'T3 · Clinical evaluation & H&P',
+     d:'In-person Russian QBS provider (Dr. Ivanov) · Section 1557 attestation signed · informed consent documented'},
+    {t:'05:12', st:'done', name:'T4 · RN check-in rounds',
+     d:'Three interpreter-supported check-ins · SBAR documented · medication reconciliation verified'},
+    {t:'14:28', st:'done', name:'T5 · Discharge planning',
+     d:'Discharge criteria explained · medication list translated · appointment scheduled · ride coordinated'},
+    {t:'14:45', st:'done', name:'T6 · Teach-back',
+     d:'Three-question teach-back completed · AI-graded 3/3 pass · G0019 billable'},
+    {t:'15:02', st:'done', name:'T7 · Post-discharge follow-up',
+     d:'72h callback auto-scheduled · TCM activated · Russian-speaking RN assigned'},
+    {t:'—',     st:'done', name:'Billing cascade',
+     d:'96160 · 99285 · G0019 · TCM-14 · total capture: <strong>$486</strong> · posted to Epic via FHIR'}
+  ];
+  var timeline = tl.map(function(r){
+    return '<div class="tp-row ' + r.st + '">' +
+      '<div class="tp-time">' + r.t + '</div>' +
+      '<div class="tp-body"><div class="tp-name">' + r.name + '</div><div class="tp-d">' + r.d + '</div></div>' +
+      '<div><span class="tp-st ' + r.st + '">' + (r.st==='done'?'complete':r.st) + '</span></div>' +
+    '</div>';
+  }).join('');
+
+  var forensic =
+    '<div class="panel">' +
+      '<div class="panel-hdr">' +
+        '<div>' +
+          '<div class="panel-title">Encounter Timeline — T1 through T7 + Billing</div>' +
+          '<div class="panel-sub">this is the direct admin mirror of what Rosa\'s tablet generated in the Navigator simulation</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:.4rem">' +
+          '<button class="qa-btn">View in FHIR</button>' +
+          '<button class="qa-btn">Audit Trail</button>' +
+          '<button class="qa-btn primary">Tag as Exemplar</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="timeline">' + timeline + '</div>' +
+      '<div class="ev-strip"><strong>Why this is flagged as an exemplar:</strong> 23 of 1,000 encounters show this level of completeness (2.3%). Tagging this encounter seeds the training library with a real case that closes every LAI domain simultaneously — the exact pattern the governance dashboard should reward.</div>' +
+    '</div>';
+
+  var comparison =
+    '<div class="panel">' +
+      '<div class="panel-hdr">' +
+        '<div>' +
+          '<div class="panel-title">Stratified Cohort Comparison · same complaint, different completeness</div>' +
+          '<div class="panel-sub">three Russian-LEP OB encounters this quarter · same chief complaint · different T-code completeness</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="dp-bar-row"><div class="dp-bar-label">Enc #4812 (this one)</div><div class="dp-bar-track"><div class="dp-bar-fill good" style="width:100%"></div></div><div class="dp-bar-val">7/7</div></div>' +
+      '<div class="dp-bar-row"><div class="dp-bar-label">Enc #3219</div><div class="dp-bar-track"><div class="dp-bar-fill warn" style="width:57%"></div></div><div class="dp-bar-val">4/7</div></div>' +
+      '<div class="dp-bar-row"><div class="dp-bar-label">Enc #2841</div><div class="dp-bar-track"><div class="dp-bar-fill crit" style="width:28%"></div></div><div class="dp-bar-val">2/7</div></div>' +
+      '<div class="ev-strip">Enc #2841 was readmitted within 30 days with the same condition. Enc #3219 was not. Enc #4812 was not. T1–T7 completeness correlates with outcome — this is the measurement argument.</div>' +
+    '</div>';
+
+  return picker + forensic + comparison;
+}
+
+function renderDomains(){
+  var domains = [
+    {n:1, name:'Access', score:12, stage:'crit', anchor:'Valderrama et al. (2021)',
+     gap:'ED median delay 23.2 min vs. 10 min target · VRI coverage drops ≥30% on night shift',
+     kpi1:{l:'≤10 min ED interpreter contact', v:3.1, tgt:90, st:'crit'},
+     kpi2:{l:'Physician language-match in service area', v:17.2, tgt:60, st:'crit'}},
+    {n:2, name:'Patient Experience', score:18, stage:'crit', anchor:'Torresdey et al. (2024)',
+     gap:'HCAHPS comm gap exceeds 2pp on all three sub-items · widest on discharge comprehension',
+     kpi1:{l:'"Providers explained understandably"', v:30.7, tgt:85, st:'crit'},
+     kpi2:{l:'"Understood treatment regimen"', v:34.1, tgt:85, st:'crit'}},
+    {n:3, name:'Clinical Outcomes', score:24, stage:'crit', anchor:'Ramirez et al. (2022)',
+     gap:'Preventive service completion 3rd-lowest nationally for Medicare LEP · prescription fill gap 18pp',
+     kpi1:{l:'Prescriptions written AND filled', v:41.3, tgt:80, st:'crit'},
+     kpi2:{l:'Recommended preventive services', v:17.1, tgt:80, st:'crit'}},
+    {n:4, name:'Compliance', score:33, stage:'crit', anchor:'45 C.F.R. §92.201',
+     gap:'1557 attestation documented for less than half of LEP encounters · malpractice exposure concentrated in ED',
+     kpi1:{l:'T1–T7 interpreter/QBS access', v:35.2, tgt:90, st:'crit'},
+     kpi2:{l:'Documented use (excl. waivers)', v:44.2, tgt:95, st:'crit'}},
+    {n:5, name:'Patient Engagement', score:8, stage:'crit', anchor:'Hong et al. (2019) HR 0.77',
+     gap:'Strongest outcome lever in the LAI · currently least activated · single highest-ROI fix',
+     kpi1:{l:'Teach-back in preferred language', v:1.7, tgt:80, st:'crit'},
+     kpi2:{l:'72h post-discharge follow-up', v:19.4, tgt:85, st:'crit'}},
+    {n:6, name:'Financial Stewardship', score:22, stage:'crit', anchor:'Lindholm et al. (2012)',
+     gap:'Only 1 of 4 cost-exposure streams actively tracked · LOS not stratified by preferred language',
+     kpi1:{l:'Streams tracked (of 4)', v:25, tgt:100, st:'crit'},
+     kpi2:{l:'LOS stratified by language', v:37.2, tgt:80, st:'crit'}},
+    {n:7, name:'Quality & Safety', score:42, stage:'warn', anchor:'Divi et al. (2007)',
+     gap:'Adverse event gap 2.8pp vs. non-LEP · 30-day readmit gap ~6pp · RCA rarely codes language',
+     kpi1:{l:'30-day readmit gap (pp)', v:6.2, tgt:2, st:'warn', invert:true},
+     kpi2:{l:'Adverse event harm gap (pp)', v:2.8, tgt:2, st:'warn', invert:true}},
+    {n:8, name:'Workforce Development', score:31, stage:'crit', anchor:'Amobi et al. (2024, JAMA)',
+     gap:'QBS credentialed providers at 6.8% · annual training completion stalled at 57% · no credentialing pathway',
+     kpi1:{l:'Staff trained current', v:57.3, tgt:95, st:'warn'},
+     kpi2:{l:'QBS-qualified providers', v:6.8, tgt:15, st:'crit'}},
+    {n:9, name:'Workflow Optimization', score:11, stage:'crit', anchor:'Khedr et al. (2020)',
+     gap:'All-complete rate 2.3% with 18pp variance across service lines — accountability gap, not infrastructure gap',
+     kpi1:{l:'T1–T7 complete (all 7)', v:2.3, tgt:85, st:'crit'},
+     kpi2:{l:'SBAR/CUS training complete', v:44.8, tgt:90, st:'crit'}},
+    {n:10, name:'Technology Innovation', score:38, stage:'warn', anchor:'Barwise et al. (2024)',
+     gap:'VRI+audio deployed in 68% of departments · automated teach-back only in 14% · low tech-integration in 67% of units',
+     kpi1:{l:'VRI+audio capable departments', v:68.0, tgt:90, st:'warn'},
+     kpi2:{l:'Auto EHR doc + auto teach-back', v:14.1, tgt:60, st:'crit'}}
+  ];
+
+  var panels = domains.map(function(d){
+    var stageBadge = '<span class="stage-chip ' + (d.stage==='crit'?'react':d.stage==='warn'?'both':'proact') + '">' +
+      (d.stage==='crit'?'CRITICAL':d.stage==='warn'?'AT RISK':'HEALTHY') + '</span>';
+    function bar(k){
+      var pct = k.invert ? Math.min(100, (k.v/Math.max(k.tgt*3,1))*100) : (k.v/100)*100;
+      var tgtPct = k.invert ? (k.tgt/Math.max(k.tgt*3,1))*100 : (k.tgt/100)*100;
+      return '<div class="dp-bar-row">' +
+        '<div class="dp-bar-label">' + k.l + '</div>' +
+        '<div class="dp-bar-track">' +
+          '<div class="dp-bar-fill ' + k.st + '" style="width:' + pct.toFixed(0) + '%"></div>' +
+          '<div class="dp-bar-tgt" style="left:' + tgtPct.toFixed(0) + '%"></div>' +
+        '</div>' +
+        '<div class="dp-bar-val">' + k.v + (k.invert?'pp':'%') + '</div>' +
+      '</div>';
+    }
+    return '<div class="panel domain-panel">' +
+      '<div class="panel-hdr">' +
+        '<div style="display:flex;align-items:baseline;gap:.6rem">' +
+          '<div style="font-size:10px;font-weight:700;color:var(--text-3);font-family:var(--mono)">LAI ' + (d.n<10?'0':'') + d.n + '</div>' +
+          '<div class="panel-title">' + d.name + '</div>' +
+          '<div style="font-size:10px;color:var(--text-3);font-family:var(--mono)">· score ' + d.score + '/100</div>' +
+        '</div>' +
+        stageBadge +
+      '</div>' +
+      bar(d.kpi1) + bar(d.kpi2) +
+      '<div class="ev-strip"><strong>Evidence anchor:</strong> ' + d.anchor + ' · <strong>Gap of record:</strong> ' + d.gap + '</div>' +
+    '</div>';
+  }).join('');
+
+  var intro =
+    '<div class="panel">' +
+      '<div class="panel-hdr">' +
+        '<div>' +
+          '<div class="panel-title">Ten Domains · Current vs. Evidence-Based Target</div>' +
+          '<div class="panel-sub">bar fill = current · dark vertical line = literature-anchored target · click a domain to inspect KPI-level detail</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;font-size:10.5px;color:var(--text-2);padding:.2rem 0">' +
+        '<div><strong style="color:var(--red-dk)">●</strong> 7 domains critical (<35)</div>' +
+        '<div><strong style="color:var(--amber-dk)">●</strong> 3 domains at risk (35–65)</div>' +
+      '</div>' +
+    '</div>';
+
+  return intro + panels;
+}
+
+function renderFinance(){
+  // 6 ROI levers from the ROI simulator
+  var levers = [
+    {n:'01', name:'ED Admission + Return Avoidance', source:'Module 1',
+     anchor:'Schulson 2018 OR 1.09 · 79.2% same-complaint returns',
+     exp:'$82,400/yr', capt:'$5,200/yr', capRate:6.3},
+    {n:'03', name:'Inpatient LOS Reduction', source:'Module 3',
+     anchor:'Lindholm 2012 · +1.0 day LOS without interpreter',
+     exp:'$148,800/yr', capt:'$11,300/yr', capRate:7.6},
+    {n:'04', name:'Readmission Avoidance via Teach-Back', source:'Module 4',
+     anchor:'Hong 2019 HR 0.77 · 23% lower condition-related',
+     exp:'$94,200/yr', capt:'$2,100/yr', capRate:2.2},
+    {n:'05a', name:'Malpractice Defense Cost Avoidance', source:'Module 5',
+     anchor:'Berkeley/NHeLP 2010 · $118K/event · two-track',
+     exp:'$67,500/yr', capt:'$8,400/yr', capRate:12.4},
+    {n:'05b', name:'State Medicaid Interpreter Reimbursement', source:'Modules 5–6',
+     anchor:'State-level T1013 · G0019 · CCM billing',
+     exp:'$41,700/yr', capt:'$13,900/yr', capRate:33.3},
+    {n:'06', name:'VBP Recapture · HCAHPS Communication', source:'Module 6',
+     anchor:'CMS VBP withhold · HCAHPS comm domain',
+     exp:'$52,400/yr', capt:'$300/yr', capRate:0.6}
+  ];
+  var total_exp = 487000, total_capt = 41200;
+
+  var hero =
+    '<div class="hero-band">' +
+      '<div class="hero-grid" style="grid-template-columns:1.2fr 1fr 1fr 1fr">' +
+        '<div>' +
+          '<div class="hero-main-l">Annualized Exposure · 6 Levers</div>' +
+          '<div class="hero-score-row"><span class="hero-score red" style="color:#fca5a5">$487K</span></div>' +
+          '<div class="hero-stage-desc">total modeled exposure if current LAI state persists through FY</div>' +
+        '</div>' +
+        '<div>' +
+          '<div class="hero-stat-l">Captured YTD</div>' +
+          '<div class="hero-stat-n green">$41.2K</div>' +
+          '<div class="hero-stat-s">from interventions already deployed</div>' +
+        '</div>' +
+        '<div>' +
+          '<div class="hero-stat-l">Capture Rate</div>' +
+          '<div class="hero-stat-n amber">8.5%</div>' +
+          '<div class="hero-stat-s">of modeled opportunity realized</div>' +
+        '</div>' +
+        '<div>' +
+          '<div class="hero-stat-l">Highest-Leverage Lever</div>' +
+          '<div class="hero-stat-n" style="font-size:14px;line-height:1.25">Teach-Back<br><small style="color:rgba(255,255,255,.5)">Module 4 · 2.2% captured</small></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  var rows = levers.map(function(l){
+    var pctClass = l.capRate<10 ? 'low' : l.capRate<25 ? 'mid' : 'high';
+    return '<div class="fin-row">' +
+      '<div class="fin-lever-l">' +
+        '<div class="fin-lever-n"><span style="color:var(--text-3);font-family:var(--mono);font-size:10px">M' + l.n + '</span> · ' + l.name + '</div>' +
+        '<div class="fin-lever-s">' + l.anchor + '</div>' +
+      '</div>' +
+      '<div class="fin-spark" style="background:linear-gradient(90deg,var(--red-lt) 0%,var(--amber-lt) 50%,var(--green-lt) 100%);border-radius:4px;height:18px"></div>' +
+      '<div class="fin-fig"><div class="fin-fig-l">Exposure</div><div class="fin-fig-v exp">' + l.exp + '</div></div>' +
+      '<div><span class="fin-pct ' + pctClass + '">' + l.capRate.toFixed(1) + '%</span></div>' +
+      '<div class="fin-fig"><div class="fin-fig-l">Captured</div><div class="fin-fig-v sav">' + l.capt + '</div></div>' +
+    '</div>';
+  }).join('');
+
+  var table =
+    '<div class="panel">' +
+      '<div class="panel-hdr">' +
+        '<div>' +
+          '<div class="panel-title">Six ROI Levers · Exposure vs. Captured</div>' +
+          '<div class="panel-sub">same modules the ROI Simulator uses · per-encounter Navigator capture rolls up here</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:.4rem">' +
+          '<button class="qa-btn">Recalibrate</button>' +
+          '<button class="qa-btn primary">Export to ROI Dashboard</button>' +
+        '</div>' +
+      '</div>' +
+      rows +
+      '<div class="ev-strip"><strong>Reading this:</strong> the Navigator\'s per-encounter billing cascade (e.g., Rosa Mendez\'s $432) is the atomic unit behind the Captured column. The Exposure column is what that captured amount would be if every LEP encounter had the same completeness. The gap between them is what the Intervention Planner is asking to close.</div>' +
+    '</div>';
+
+  return hero + table;
+}
+
+function renderWorkforce(){
+  var blocks =
+    '<div class="panel">' +
+      '<div class="panel-hdr">' +
+        '<div>' +
+          '<div class="panel-title">QBS Credential Pipeline · Training Completion</div>' +
+          '<div class="panel-sub">workforce readiness for the deployed LEP-match workload</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="wf-grid">' +
+        '<div class="wf-block">' +
+          '<div class="wf-block-l">QBS-qualified providers</div>' +
+          '<div class="wf-block-v">6.8%</div>' +
+          '<div class="wf-block-d">68 of 1,000 encounter-provider assignments · below 15% target · priority: Spanish, Mandarin</div>' +
+          '<div class="wf-bar"><div class="wf-bar-t"><div class="wf-bar-f" style="width:45%"></div></div></div>' +
+        '</div>' +
+        '<div class="wf-block">' +
+          '<div class="wf-block-l">Annual training current</div>' +
+          '<div class="wf-block-v">57.3%</div>' +
+          '<div class="wf-block-d">stalled · 428 staff overdue · 211 expire next 90 days · Night-shift coverage weakest</div>' +
+          '<div class="wf-bar"><div class="wf-bar-t"><div class="wf-bar-f" style="width:60%"></div></div></div>' +
+        '</div>' +
+        '<div class="wf-block">' +
+          '<div class="wf-block-l">Provider-patient language match</div>' +
+          '<div class="wf-block-v">17.2%</div>' +
+          '<div class="wf-block-d">geographic mismatch · service-area LEP dominated by Spanish (42%), Mandarin (14%)</div>' +
+          '<div class="wf-bar"><div class="wf-bar-t"><div class="wf-bar-f" style="width:17%;background:var(--amber)"></div></div></div>' +
+        '</div>' +
+        '<div class="wf-block">' +
+          '<div class="wf-block-l">QBS pipeline · in testing</div>' +
+          '<div class="wf-block-v">12</div>' +
+          '<div class="wf-block-d">physicians + 4 NPs enrolled · 3 Spanish · 4 Mandarin · 5 other · avg time to cert: 14 weeks</div>' +
+          '<div class="wf-bar"><div class="wf-bar-t"><div class="wf-bar-f" style="width:80%"></div></div></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  var shifts =
+    '<div class="panel">' +
+      '<div class="panel-hdr">' +
+        '<div>' +
+          '<div class="panel-title">Language-Match Gap by Shift × Unit</div>' +
+          '<div class="panel-sub">where the deployment is thinnest · actionable for staffing and vendor sourcing</div>' +
+        '</div>' +
+      '</div>' +
+      '<table class="heatmap-tbl">' +
+        '<thead><tr><th>Unit</th><th>Day (07–15)</th><th>Evening (15–23)</th><th>Night (23–07)</th><th>Weekend</th></tr></thead>' +
+        '<tbody>' +
+          '<tr><td>ED-A</td><td><span class="hm-cell hm-3">41.2</span></td><td><span class="hm-cell hm-2">28.4</span></td><td><span class="hm-cell hm-1">11.2</span></td><td><span class="hm-cell hm-2">19.8</span></td></tr>' +
+          '<tr><td>ED-B</td><td><span class="hm-cell hm-3">38.7</span></td><td><span class="hm-cell hm-2">24.1</span></td><td><span class="hm-cell hm-0">6.8</span></td><td><span class="hm-cell hm-1">15.4</span></td></tr>' +
+          '<tr><td>L&D-1</td><td><span class="hm-cell hm-4">52.4</span></td><td><span class="hm-cell hm-3">39.1</span></td><td><span class="hm-cell hm-2">22.3</span></td><td><span class="hm-cell hm-3">41.8</span></td></tr>' +
+          '<tr><td>Med-Surg-2</td><td><span class="hm-cell hm-2">24.7</span></td><td><span class="hm-cell hm-1">17.2</span></td><td><span class="hm-cell hm-0">8.1</span></td><td><span class="hm-cell hm-1">12.9</span></td></tr>' +
+          '<tr><td>Postpartum-1</td><td><span class="hm-cell hm-3">44.1</span></td><td><span class="hm-cell hm-2">29.8</span></td><td><span class="hm-cell hm-2">21.4</span></td><td><span class="hm-cell hm-3">38.2</span></td></tr>' +
+        '</tbody>' +
+      '</table>' +
+      '<div class="ev-strip"><strong>Deployable insight:</strong> Night-shift coverage in ED-B and Med-Surg-2 falls below 10% language-match. The two interpreters requesting training upgrades are both Mandarin — a direct fit for the thinnest slot. <strong>Action:</strong> reassign vendor VRI priority routing to Night × ED-B for 30 days, then re-measure.</div>' +
+    '</div>';
+
+  return blocks + shifts;
+}
+
+function renderIntervene(){
+  var scenarios =
+    '<div class="panel">' +
+      '<div class="panel-hdr">' +
+        '<div>' +
+          '<div class="panel-title">Scenario Modeling · What Moves the LAI?</div>' +
+          '<div class="panel-sub">drag any slider to model a 90-day intervention · impact computed against encounter-level dataset</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:.4rem">' +
+          '<button class="qa-btn">Reset to current</button>' +
+          '<button class="qa-btn primary">Save as CAP draft</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="scenario-row">' +
+        '<div class="scenario-l">Teach-back rate in preferred language <em>highest-leverage lever · HR 0.77 readmission (Hong 2019)</em></div>' +
+        '<div class="scenario-inp"><input type="range" class="scenario-range" min="0" max="100" value="60"><div class="scenario-v">60%</div></div>' +
+        '<div class="scenario-impact">+$62K<br><small style="font-weight:400;color:var(--text-3)">LAI +11</small></div>' +
+      '</div>' +
+      '<div class="scenario-row">' +
+        '<div class="scenario-l">QBS-credentialed providers (currently 6.8%) <em>2-year pipeline · $4.2K per credential</em></div>' +
+        '<div class="scenario-inp"><input type="range" class="scenario-range" min="0" max="30" value="15"><div class="scenario-v">15%</div></div>' +
+        '<div class="scenario-impact">+$41K<br><small style="font-weight:400;color:var(--text-3)">LAI +6</small></div>' +
+      '</div>' +
+      '<div class="scenario-row">' +
+        '<div class="scenario-l">ED ≤10 min interpreter contact (currently 3.1%) <em>VRI routing + night-shift staffing</em></div>' +
+        '<div class="scenario-inp"><input type="range" class="scenario-range" min="0" max="100" value="70"><div class="scenario-v">70%</div></div>' +
+        '<div class="scenario-impact">+$38K<br><small style="font-weight:400;color:var(--text-3)">LAI +8</small></div>' +
+      '</div>' +
+      '<div class="scenario-row">' +
+        '<div class="scenario-l">T1–T7 complete rate (currently 2.3%) <em>hard-stop in EHR at each touchpoint</em></div>' +
+        '<div class="scenario-inp"><input type="range" class="scenario-range" min="0" max="100" value="60"><div class="scenario-v">60%</div></div>' +
+        '<div class="scenario-impact">+$94K<br><small style="font-weight:400;color:var(--text-3)">LAI +14</small></div>' +
+      '</div>' +
+      '<div class="scenario-row">' +
+        '<div class="scenario-l">Annual training completion (currently 57.3%) <em>refresh at attestation deadline</em></div>' +
+        '<div class="scenario-inp"><input type="range" class="scenario-range" min="0" max="100" value="95"><div class="scenario-v">95%</div></div>' +
+        '<div class="scenario-impact">+$18K<br><small style="font-weight:400;color:var(--text-3)">LAI +4</small></div>' +
+      '</div>' +
+    '</div>';
+
+  var summary =
+    '<div class="panel" style="background:linear-gradient(135deg,#F0FDF4,#fff)">' +
+      '<div class="panel-hdr">' +
+        '<div>' +
+          '<div class="panel-title" style="color:var(--green-dk)">Projected Impact · 90-Day Composite</div>' +
+          '<div class="panel-sub">five-lever intervention bundle modeled above</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">' +
+        '<div><div class="wf-block-l">LAI composite</div><div class="wf-block-v" style="color:var(--green-dk)">23 → 66</div><div class="wf-block-d">crosses Stage 3 Optimizing threshold</div></div>' +
+        '<div><div class="wf-block-l">Realized capture</div><div class="wf-block-v" style="color:var(--green-dk)">+$253K</div><div class="wf-block-d">52% of the $487K modeled exposure</div></div>' +
+        '<div><div class="wf-block-l">Implementation cost</div><div class="wf-block-v">$84K</div><div class="wf-block-d">QBS pipeline + VRI routing + EHR hard-stops · net ROI 3.0×</div></div>' +
+      '</div>' +
+    '</div>';
+
+  return scenarios + summary;
+}
+
+function renderAuditReady(){
+  var ring =
+    '<div class="panel">' +
+      '<div class="panel-hdr">' +
+        '<div>' +
+          '<div class="panel-title">Section 1557 Spot-Review Readiness</div>' +
+          '<div class="panel-sub">evidence-package completeness · 45 C.F.R. §92.201 · OCR-style inspection simulation</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ready-ring">' +
+        '<svg class="ready-ring-svg" width="130" height="130" viewBox="0 0 130 130">' +
+          '<circle cx="65" cy="65" r="54" fill="none" stroke="#F5F5F5" stroke-width="14"/>' +
+          '<circle cx="65" cy="65" r="54" fill="none" stroke="#D97706" stroke-width="14"' +
+            ' stroke-dasharray="150 339" stroke-linecap="round" transform="rotate(-90 65 65)"/>' +
+          '<text x="65" y="62" text-anchor="middle" font-size="28" font-weight="700" fill="#1a1a1a">44%</text>' +
+          '<text x="65" y="78" text-anchor="middle" font-size="9" fill="#888" font-weight="600" letter-spacing="1.2">READY</text>' +
+        '</svg>' +
+        '<div class="ready-ring-meta">' +
+          '<div class="ready-ring-t">At current documentation completeness, 556 of 1,000 Q1 encounters would fail a Section 1557 spot review.</div>' +
+          '<div class="ready-ring-d">Most common failure: missing T3 attestation on H&P · second: missing interpreter start-time stamp · third: discharge instruction language not documented. The first and second are fixable in the EHR template. The third requires a workflow hard-stop.</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  var failures =
+    '<div class="panel">' +
+      '<div class="panel-hdr">' +
+        '<div>' +
+          '<div class="panel-title">Top Failure Modes · Encounters Not Audit-Ready</div>' +
+          '<div class="panel-sub">ranked by frequency · each is fixable · click to see the encounter list</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="dp-bar-row"><div class="dp-bar-label">Missing T3 1557 attestation</div><div class="dp-bar-track"><div class="dp-bar-fill crit" style="width:55%"></div></div><div class="dp-bar-val">556</div></div>' +
+      '<div class="dp-bar-row"><div class="dp-bar-label">No interpreter start-time</div><div class="dp-bar-track"><div class="dp-bar-fill crit" style="width:42%"></div></div><div class="dp-bar-val">423</div></div>' +
+      '<div class="dp-bar-row"><div class="dp-bar-label">Discharge instr. language</div><div class="dp-bar-track"><div class="dp-bar-fill warn" style="width:31%"></div></div><div class="dp-bar-val">312</div></div>' +
+      '<div class="dp-bar-row"><div class="dp-bar-label">Missing clinical lang. field</div><div class="dp-bar-track"><div class="dp-bar-fill warn" style="width:22%"></div></div><div class="dp-bar-val">218</div></div>' +
+      '<div class="dp-bar-row"><div class="dp-bar-label">Touchpoint T4 check-in gap</div><div class="dp-bar-track"><div class="dp-bar-fill warn" style="width:18%"></div></div><div class="dp-bar-val">183</div></div>' +
+      '<div class="qa-bar">' +
+        '<button class="qa-btn">Generate evidence package</button>' +
+        '<button class="qa-btn">Download OCR-format CSV</button>' +
+        '<button class="qa-btn primary">Queue EHR template fix</button>' +
+      '</div>' +
+    '</div>';
+
+  return ring + failures;
+}
+
+function renderBoard(){
+  var doc =
+    '<div class="panel" style="background:none;border:none;padding:0">' +
+      '<div class="panel-hdr">' +
+        '<div>' +
+          '<div class="panel-title">Governance Synthesis · Four-Component Format</div>' +
+          '<div class="panel-sub">the structure from CLEAR Module 7 · every component independently required for a defensible case</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:.4rem">' +
+          '<button class="qa-btn">Edit narrative</button>' +
+          '<button class="qa-btn primary">Export to .docx</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="brief-doc">' +
+        '<div class="brief-h1">Language Access Reliability · Governance Brief</div>' +
+        '<div class="brief-h2">Eisenhower Health · Q1 2026 · Prepared for Board Quality Committee</div>' +
+        '<div class="brief-comp">' +
+          '<div class="brief-comp-n">Component 1 · Financial Exposure</div>' +
+          '<div class="brief-comp-t">$487K annualized exposure across six ROI levers</div>' +
+          '<div class="brief-comp-b">Current LAI composite of 23/100 corresponds to an annualized modeled exposure of <strong>$487,000</strong> across the six independently-priced cost streams (admission avoidance · LOS reduction · readmission avoidance · malpractice defense · state reimbursement · VBP). Of that exposure, <strong>$41,200 has been captured year-to-date (8.5%)</strong> from previously deployed interventions. The highest-leverage unaddressed lever is teach-back (Hong 2019 HR 0.77) at 2.2% capture.</div>' +
+        '</div>' +
+        '<div class="brief-comp">' +
+          '<div class="brief-comp-n">Component 2 · Clinical Evidence</div>' +
+          '<div class="brief-comp-t">Seven of ten LAI domains below the critical threshold of 35/100</div>' +
+          '<div class="brief-comp-b">Strongest outcome-linked evidence base in language access is teach-back through a qualified interpreter in the patient preferred language (Hong et al., 2019). Current rate: <strong>1.7%</strong>. Secondary evidence: LOS differential (Lindholm 2012) · adverse event gap (Divi 2007) · readmission reduction (Karliner 2020). All four evidence bases apply to the current Eisenhower LEP population.</div>' +
+        '</div>' +
+        '<div class="brief-comp">' +
+          '<div class="brief-comp-n">Component 3 · Governance Infrastructure</div>' +
+          '<div class="brief-comp-t">Accountability architecture present but not operationalized</div>' +
+          '<div class="brief-comp-b">Language-access policy exists; Section 1557 attestation template exists; interpreter vendor contracts are active. Operationalization gap: T1–T7 completion rate is <strong>2.3%</strong> with <strong>18pp variance across service lines</strong> — this is a leadership accountability gap, not an infrastructure gap. Proposed fix: add T1–T7 completion to service line scorecards; review quarterly.</div>' +
+        '</div>' +
+        '<div class="brief-comp">' +
+          '<div class="brief-comp-n">Component 4 · Investment Case</div>' +
+          '<div class="brief-comp-t">$84K investment · projected $253K realized capture · 3.0× net ROI · 90-day horizon</div>' +
+          '<div class="brief-comp-b">Five-lever intervention bundle (teach-back workflow · QBS pipeline · ED VRI routing · EHR hard-stops · training refresh) projects a 90-day composite movement from <strong>23 → 66</strong>, crossing the Stage 3 Optimizing threshold. Realized capture: <strong>+$253K</strong>. Implementation cost: <strong>$84K</strong>. Net ROI: <strong>3.0×</strong>. Financial case independently verified in the ROI Dashboard module-by-module calibration.</div>' +
+        '</div>' +
+        '<div class="ev-strip" style="margin-top:1rem"><strong>Board commitment ask:</strong> endorse the five-lever intervention bundle, name an accountable executive sponsor, and review LAI composite at every quarterly Quality Committee meeting for the next four quarters. The measurement argument is complete. The decision is governance commitment.</div>' +
+      '</div>' +
+    '</div>';
+
+  return doc;
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+ * LIVE SIGNALS (right rail)
+ * ──────────────────────────────────────────────────────────────────────── */
+function renderSignals(){
+  var html = SIGNALS.map(function(s){
+    return '<div class="sig ' + s.kind + '">' +
+      '<div class="sig-time">' + s.t + ' <span class="sig-kind">' + s.cat + '</span></div>' +
+      '<div class="sig-body">' + s.body + '</div>' +
+      '<div class="sig-meta">' + s.meta + '</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('rr-stream').innerHTML = html;
+}
+
+/* Init */
+go('mission');
+renderSignals();
+</script>
+
+</body>
+</html>
